@@ -13,9 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.elliott.supervideoplayer.utils.BitmapUtil;
@@ -61,7 +59,7 @@ public class CustomMediaController extends MediaController {
 
      */
     private IDanmakuView mDanmakuView;
-    private Switch mtanMuSwitch;
+   // private Switch mtanMuSwitch;
     private DanmakuContext mDanmakuContext;
     private BaseDanmakuParser mParser;
 
@@ -91,22 +89,22 @@ public class CustomMediaController extends MediaController {
 
     @Override
     protected void initOtherView() {
-        mtanMuSwitch= (Switch) mRoot.findViewById(R.id.switch_tanmu);
-        mtanMuSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_red_color));
-                    //开启弹幕
-                    mDanmakuView.prepare(mParser, mDanmakuContext);
-                    mDanmakuView.show();
-                }else{
-                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_gray_color));
-                    //关闭弹幕
-                    mDanmakuView.hide();
-                }
-            }
-        });
+//        mtanMuSwitch= (Switch) mRoot.findViewById(R.id.switch_tanmu);
+//        mtanMuSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if(isChecked){
+//                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_red_color));
+//                    //开启弹幕
+//                    mDanmakuView.prepare(mParser, mDanmakuContext);
+//                    mDanmakuView.show();
+//                }else{
+//                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_gray_color));
+//                    //关闭弹幕
+//                    mDanmakuView.hide();
+//                }
+//            }
+//        });
         mediacontroller_snapshot= (ImageView) mRoot.findViewById(R.id.mediacontroller_snapshot);
         mediacontroller_previous= (ImageView) mRoot.findViewById(R.id.mediacontroller_previous);
         mediacontroller_next= (ImageView) mRoot.findViewById(R.id.mediacontroller_next);

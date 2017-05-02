@@ -3,8 +3,6 @@ package com.elliott.supervideoplayer;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import io.vov.vitamio.widget.MediaController;
 import master.flame.danmaku.controller.IDanmakuView;
@@ -20,7 +18,7 @@ public class CustomMediaLiveController extends MediaController {
      * 弹幕相关
      */
     private IDanmakuView mDanmakuView;
-    private Switch mtanMuSwitch;
+  //  private Switch mtanMuSwitch;
     private DanmakuContext mDanmakuContext;
     private BaseDanmakuParser mParser;
 
@@ -37,22 +35,22 @@ public class CustomMediaLiveController extends MediaController {
 
     @Override
     protected void initOtherView() {
-        mtanMuSwitch= (Switch) mRoot.findViewById(R.id.switch_tanmu);
-        mtanMuSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_red_color));
-                    //开启弹幕
-                    mDanmakuView.prepare(mParser, mDanmakuContext);
-                    mDanmakuView.show();
-                }else{
-                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_gray_color));
-                    //关闭弹幕
-                    mDanmakuView.hide();
-                }
-            }
-        });
+//        mtanMuSwitch= (Switch) mRoot.findViewById(R.id.switch_tanmu);
+//        mtanMuSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if(isChecked){
+//                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_red_color));
+//                    //开启弹幕
+//                    mDanmakuView.prepare(mParser, mDanmakuContext);
+//                    mDanmakuView.show();
+//                }else{
+//                    mtanMuSwitch.setBackgroundColor(getResources().getColor(R.color.video_gray_color));
+//                    //关闭弹幕
+//                    mDanmakuView.hide();
+//                }
+//            }
+//        });
     }
     public void setTanMuView(IDanmakuView tanMuView,DanmakuContext mDanmakuContext,BaseDanmakuParser mParser ) {
         this.mDanmakuView = tanMuView;
