@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.elliott.supervideoplayer.model.VideoBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  */
@@ -20,7 +21,9 @@ public class VideoBeanDaoHelper {
     }
 
     public ArrayList<VideoBean> getDatasByType(int type){
-        return (ArrayList<VideoBean>) noteDao.queryBuilder().where(VideoBeanDao.Properties.Type.eq(type)).list();
+        ArrayList<VideoBean> list = (ArrayList<VideoBean>) noteDao.queryBuilder().where(VideoBeanDao.Properties.Type.eq(type)).list();
+        Collections.sort(list);
+        return list;
     }
 
     public void insertBean(VideoBean bean){

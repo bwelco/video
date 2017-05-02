@@ -29,29 +29,32 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class LaunchActivity extends Activity {
     /**
      */
-    private String[] mVideoTestPath =new String[]{
+    private String[] mVideoTestPath = new String[]{
             "http://omjfzo9d3.bkt.clouddn.com/video_20170426_162819.mp4",
             "http://omjfzo9d3.bkt.clouddn.com/video_20170426_162920.mp4",
             "http://omjfzo9d3.bkt.clouddn.com/video_20170427_153640.mp4"
-    } ;
-    private String[] mVideoTestPathName =new String[]{
-            "20170426_162819","20170426_162920","20170427_153640"
-    } ;
+    };
+    private String[] mVideoTestPathName = new String[]{
+            "home1", "home2", "home3"
+    };
+
+    private long[] mTimes = new long[]{1493186505000L, 1493200905000L, 1493287305000L};
 
     /**
 
 
      */
-    private String[] mVideoLiveTestPath =new String[]{
+    private String[] mVideoLiveTestPath = new String[]{
 
-    } ;
-    private String[] mVideoLivePathName =new String[]{
-            "RTMP","m3u8 "
-    } ;
+    };
+    private String[] mVideoLivePathName = new String[]{
+            "RTMP", "m3u8 "
+    };
     private LinearLayout mLinearLayout;
     private LinearLayout linearLayout;
     private LinearLayout lineaylayout2;
@@ -63,11 +66,11 @@ public class LaunchActivity extends Activity {
     /**
      * 底部菜单按钮
      */
-    FloatingActionMenu  floatingActionMenu;
+    FloatingActionMenu floatingActionMenu;
 
     VideoBeanDaoHelper helper;
     /**
-     *  0表示在线视频  1表示直播
+     * 0表示在线视频  1表示直播
      */
     private int currentType;
 
@@ -84,26 +87,29 @@ public class LaunchActivity extends Activity {
         initDatas();
         initTestDatas();
         showCurrentListView();
-   }
+
+
+    }
 
     /**
      * 添加测试数据
      */
     private void initTestDatas() {
         ArrayList<VideoBean> datasByList = helper.getDatasByType(currentType);
-        if(datasByList.size()<=0){
+        if (datasByList.size() <= 0) {
             //在线视频
-            for (int i=0;i<mVideoTestPath.length;i++){
-                VideoBean bean=new VideoBean();
+            for (int i = 0; i < mVideoTestPath.length; i++) {
+                VideoBean bean = new VideoBean();
                 bean.setVideoLink(mVideoTestPath[i]);
                 bean.setVideoName(mVideoTestPathName[i]);
+                bean.setTime(mTimes[i]);
                 bean.setType(currentType);
                 helper.insertBean(bean);
                 showCurrentTypeData(bean);
             }
-           //直播流
-            for (int i=0;i<mVideoLiveTestPath.length;i++){
-                VideoBean bean=new VideoBean();
+            //直播流
+            for (int i = 0; i < mVideoLiveTestPath.length; i++) {
+                VideoBean bean = new VideoBean();
                 bean.setVideoLink(mVideoLiveTestPath[i]);
                 bean.setVideoName(mVideoLivePathName[i]);
                 bean.setType(1);
@@ -119,9 +125,9 @@ public class LaunchActivity extends Activity {
     }
 
     private void initViews() {
-        mLinearLayout= (LinearLayout) findViewById(R.id.linearlayout_content);
+        mLinearLayout = (LinearLayout) findViewById(R.id.linearlayout_content);
         linearLayout = (LinearLayout) findViewById(R.id.button_layout_2);
-        lineaylayout2= (LinearLayout) findViewById(R.id.button_layout_3);
+        lineaylayout2 = (LinearLayout) findViewById(R.id.button_layout_3);
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,25 +142,25 @@ public class LaunchActivity extends Activity {
                 showCurrentListView();
             }
         });
-        ImageView2= (ImageView) findViewById(R.id.button_line_img2);
-        ImageView3= (ImageView) findViewById(R.id.button_line_img3);
+        ImageView2 = (ImageView) findViewById(R.id.button_line_img2);
+        ImageView3 = (ImageView) findViewById(R.id.button_line_img3);
         handTitleIndexImg(0);
     }
 
     private void handTitleIndexImg(int position) {
-        currentType=position;
-        ArrayList<View> list=new ArrayList<>();
+        currentType = position;
+        ArrayList<View> list = new ArrayList<>();
         list.add(ImageView2);
         list.add(ImageView3);
-        int size =list.size();
-        for (int i=0;i<size;i++){
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
             list.get(i).setVisibility(View.INVISIBLE);
         }
         list.get(position).setVisibility(View.VISIBLE);
     }
 
     private void initMenus() {
-        ImageView menuimg= (ImageView) findViewById(R.id.menu_img);
+        ImageView menuimg = (ImageView) findViewById(R.id.menu_img);
         SubActionButton.Builder rLSubBuilder = new SubActionButton.Builder(this);
         ImageView rlIcon1 = new ImageView(this);
         ImageView rlIcon4 = new ImageView(this);
@@ -178,7 +184,7 @@ public class LaunchActivity extends Activity {
                 floatingActionMenu.close(true);
             }
         });
-       floatingActionMenu= new FloatingActionMenu.Builder(this)
+        floatingActionMenu = new FloatingActionMenu.Builder(this)
                 .setStartAngle(210)
                 .setEndAngle(250)
                 .addSubActionView(rlSub1)
@@ -188,22 +194,24 @@ public class LaunchActivity extends Activity {
     }
 
     private void showAddVideoItemDialog() {
-       final  DialogUtils dialogUtils=new DialogUtils(this,R.layout.normal_dialog);
+        final DialogUtils dialogUtils = new DialogUtils(this, R.layout.normal_dialog);
         dialogUtils.setOnClickListener(R.id.btn_ok, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //插入listview
-                EditText linkEd= (EditText)dialogUtils.getView(R.id.dialog_link_ed);
-                EditText nameEd= (EditText)dialogUtils.getView(R.id.dialog_name_ed);
-                if(!TextUtils.isEmpty(linkEd.getText().toString())&&!TextUtils.isEmpty(nameEd.getText().toString())){
-                    VideoBean bean=new VideoBean();
+                EditText linkEd = (EditText) dialogUtils.getView(R.id.dialog_link_ed);
+                EditText nameEd = (EditText) dialogUtils.getView(R.id.dialog_name_ed);
+
+                if (!TextUtils.isEmpty(linkEd.getText().toString()) && !TextUtils.isEmpty(nameEd.getText().toString())) {
+                    VideoBean bean = new VideoBean();
                     bean.setVideoLink(linkEd.getText().toString());
                     bean.setVideoName(nameEd.getText().toString());
                     bean.setType(currentType);
+                    bean.setTime(System.currentTimeMillis());
                     helper.insertBean(bean);
                     showCurrentTypeData(bean);
-                }else{
-                    T.showLong(LaunchActivity.this,"请求填写正确的流视频");
+                } else {
+                    T.showLong(LaunchActivity.this, "请求填写正确的流视频");
                 }
                 dialogUtils.close();
             }
@@ -214,22 +222,26 @@ public class LaunchActivity extends Activity {
             }
         }).show();
     }
-    private void  showCurrentTypeData(VideoBean bean){
+
+    private void showCurrentTypeData(VideoBean bean) {
         mDataMaps.get(currentType).add(bean);
+        Collections.sort(mDataMaps.get(currentType));
         mAdapters.get(currentType).notifyDataSetChanged();
     }
-    private void  deleteCurrentTypeData(int position){
-        VideoBean bean =mDataMaps.get(currentType).get(position);
+
+    private void deleteCurrentTypeData(int position) {
+        VideoBean bean = mDataMaps.get(currentType).get(position);
         helper.deleteBean(bean);
         mDataMaps.get(currentType).remove(bean);
         mAdapters.get(currentType).notifyDataSetChanged();
     }
+
     private void initDatas() {
-        helper=new VideoBeanDaoHelper(this);
-        mViewList=new ArrayList<View>();
-        mDataMaps=new SparseArray<>();
-        mAdapters=new SparseArray<>();
-        for (int i=0;i<2;i++) {
+        helper = new VideoBeanDaoHelper(this);
+        mViewList = new ArrayList<View>();
+        mDataMaps = new SparseArray<>();
+        mAdapters = new SparseArray<>();
+        for (int i = 0; i < 2; i++) {
             SwipeMenuListView listview = new SwipeMenuListView(this);
             ArrayList<VideoBean> dataList = helper.getDatasByType(i);
             VideoAdapter videoAdapter = new VideoAdapter(this, dataList, R.layout.video_item_layout);
@@ -271,23 +283,23 @@ public class LaunchActivity extends Activity {
                     return false;
                 }
             });
-            mDataMaps.put(i,dataList);
-            mAdapters.put(i,videoAdapter);
+            mDataMaps.put(i, dataList);
+            mAdapters.put(i, videoAdapter);
             mViewList.add(listview);
         }
     }
 
     private void goToVideoPlayerPage(VideoBean bean) {
-        if(currentType==0){
-            Intent appIntent = new Intent(this,VideoViewActivity.class);
-            appIntent.putExtra(VideoViewActivity.VIDEO_PATH,bean.getVideoLink());
+        if (currentType == 0) {
+            Intent appIntent = new Intent(this, VideoViewActivity.class);
+            appIntent.putExtra(VideoViewActivity.VIDEO_PATH, bean.getVideoLink());
             startActivity(appIntent);
-        }else{
-            try{
-                Intent appIntent = new Intent(this,VideoViewLiveActivity.class);
-                appIntent.putExtra(VideoViewLiveActivity.VIDEO_PATH,bean.getVideoLink());
+        } else {
+            try {
+                Intent appIntent = new Intent(this, VideoViewLiveActivity.class);
+                appIntent.putExtra(VideoViewLiveActivity.VIDEO_PATH, bean.getVideoLink());
                 startActivity(appIntent);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -295,7 +307,7 @@ public class LaunchActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(floatingActionMenu!=null&&floatingActionMenu.isOpen()){
+        if (floatingActionMenu != null && floatingActionMenu.isOpen()) {
             floatingActionMenu.close(true);
         }
         return super.onTouchEvent(event);
