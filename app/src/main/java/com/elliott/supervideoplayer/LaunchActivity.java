@@ -183,9 +183,12 @@ public class LaunchActivity extends Activity implements SwipeRefreshLayout.OnRef
         monitorView = LayoutInflater.from(this).inflate(R.layout.monitor_view, null, false);
         webView = (WebView) monitorView.findViewById(R.id.webview);
         monitorView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        String uri = "http://" + ConfigUtil.getIp(this) + ":8080/?action=stream";
+        String uri = "http://" + ConfigUtil.getIp(this) + ":8080/javascript_simple.html";
         webView.loadUrl(uri);
         WebSettings settings = webView.getSettings();
+        settings.setDisplayZoomControls(false);
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
         settings.setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
