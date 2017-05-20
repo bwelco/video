@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/white"
+            android:text="摄像头地址"
+            android:gravity="center"
+            android:layout_height="50dp"
+            android:layout_width="wrap_content" />
+
+        <EditText
+            android:background="@android:color/white"
+            android:padding="5dp"
+            android:hint="ip地址"
+            android:id="@+id/ip_config"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/white"
+            android:text="报警电话"
+            android:gravity="center"
+            android:layout_height="50dp"
+            android:layout_width="wrap_content" />
+
+        <EditText
+            android:background="@android:color/white"
+            android:padding="5dp"
+            android:hint="默认报警号码"
+            android:id="@+id/default_police_phone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/save_config"
+        android:layout_marginTop="10dp"
+        android:text="更新设置"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

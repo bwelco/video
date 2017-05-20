@@ -1,18 +1,30 @@
 package com.elliott.supervideoplayer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -21,17 +33,24 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.elliott.supervideoplayer.adapter.VideoAdapter;
 import com.elliott.supervideoplayer.db.VideoBeanDaoHelper;
 import com.elliott.supervideoplayer.model.VideoBean;
+import com.elliott.supervideoplayer.utils.BitmapUtil;
+import com.elliott.supervideoplayer.utils.ConfigUtil;
 import com.elliott.supervideoplayer.utils.DensityUtils;
 import com.elliott.supervideoplayer.utils.DialogUtils;
 import com.elliott.supervideoplayer.utils.ExceptionHandler;
+import com.elliott.supervideoplayer.utils.RandomUtil;
 import com.elliott.supervideoplayer.utils.T;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class LaunchActivity extends Activity {
+import static android.R.attr.path;
+
+public class LaunchActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener {
     /**
      */
     private String[] mVideoTestPath = new String[]{
@@ -63,6 +82,11 @@ public class LaunchActivity extends Activity {
     private ArrayList<View> mViewList;
     private SparseArray<ArrayList<VideoBean>> mDataMaps;
     private SparseArray<VideoAdapter> mAdapters;
+    private View monitorView;
+    private WebView webView;
+    private RelativeLayout police;
+    private RelativeLayout screen;
+    private SwipeRefreshLayout refreshLayout;
     /**
      * 底部菜单按钮
      */
@@ -119,6 +143,16 @@ public class LaunchActivity extends Activity {
         }
     }
 
+    private void switchToVideo() {
+        mLinearLayout.removeAllViews();
+        mLinearLayout.addView(mViewList.get(0));
+    }
+
+    private void switchToMonitor() {
+        mLinearLayout.removeAllViews();
+        mLinearLayout.addView(monitorView);
+    }
+
     private void showCurrentListView() {
         mLinearLayout.removeAllViews();
         mLinearLayout.addView(mViewList.get(currentType));
@@ -132,7 +166,8 @@ public class LaunchActivity extends Activity {
             @Override
             public void onClick(View v) {
                 handTitleIndexImg(0);
-                showCurrentListView();
+                //showCurrentListView();
+                switchToVideo();
             }
         });
         lineaylayout2.setOnClickListener(new View.OnClickListener() {
@@ -140,11 +175,57 @@ public class LaunchActivity extends Activity {
             public void onClick(View v) {
                 handTitleIndexImg(1);
                 showCurrentListView();
+                switchToMonitor();
             }
         });
         ImageView2 = (ImageView) findViewById(R.id.button_line_img2);
         ImageView3 = (ImageView) findViewById(R.id.button_line_img3);
+        monitorView = LayoutInflater.from(this).inflate(R.layout.monitor_view, null, false);
+        webView = (WebView) monitorView.findViewById(R.id.webview);
+        monitorView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        String uri = "http://" + ConfigUtil.getIp(this) + ":8080/?action=stream";
+        webView.loadUrl(uri);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        refreshLayout = (SwipeRefreshLayout) monitorView.findViewById(R.id.refresh);
+        refreshLayout.setOnRefreshListener(this);
         handTitleIndexImg(0);
+        police = (RelativeLayout) monitorView.findViewById(R.id.police_layout);
+        screen = (RelativeLayout) monitorView.findViewById(R.id.screen_layout);
+        police.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + ConfigUtil.getPhone(LaunchActivity.this)));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
+        screen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.setDrawingCacheEnabled(true);
+                Bitmap tBitmap = webView.getDrawingCache();
+                tBitmap = tBitmap.createBitmap(tBitmap);
+                webView.setDrawingCacheEnabled(false);
+                if (tBitmap != null) {
+                    if (saveImageToGallery(LaunchActivity.this, tBitmap)) {
+                        Toast.makeText(getApplicationContext(), "截图成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "截图失败", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "截图失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void handTitleIndexImg(int position) {
@@ -163,13 +244,14 @@ public class LaunchActivity extends Activity {
         ImageView menuimg = (ImageView) findViewById(R.id.menu_img);
         SubActionButton.Builder rLSubBuilder = new SubActionButton.Builder(this);
         ImageView rlIcon1 = new ImageView(this);
-        ImageView rlIcon4 = new ImageView(this);
+        ImageView rlIcon2 = new ImageView(this);
 
         rlIcon1.setImageDrawable(getResources().getDrawable(R.drawable.action_edit_light));
-        rlIcon4.setImageDrawable(getResources().getDrawable(R.drawable.abc_ic_clear_search_api_holo_light));
+        rlIcon2.setImageDrawable(getResources().getDrawable(R.drawable.setting));
 
         SubActionButton rlSub1 = rLSubBuilder.setContentView(rlIcon1).build();
-        SubActionButton rlSub4 = rLSubBuilder.setContentView(rlIcon4).build();
+        SubActionButton rlSub2 = rLSubBuilder.setContentView(rlIcon2).build();
+
         rlIcon1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,18 +259,19 @@ public class LaunchActivity extends Activity {
                 showAddVideoItemDialog();
             }
         });
-        rlIcon4.setOnClickListener(new View.OnClickListener() {
+
+        rlIcon2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //退出
-                floatingActionMenu.close(true);
+                startActivity(new Intent(LaunchActivity.this, SettingActivity.class));
+
             }
         });
         floatingActionMenu = new FloatingActionMenu.Builder(this)
-                .setStartAngle(210)
+                .setStartAngle(190)
                 .setEndAngle(250)
                 .addSubActionView(rlSub1)
-                .addSubActionView(rlSub4)
+                .addSubActionView(rlSub2)
                 .attachTo(menuimg)
                 .build();
     }
@@ -311,5 +394,36 @@ public class LaunchActivity extends Activity {
             floatingActionMenu.close(true);
         }
         return super.onTouchEvent(event);
+    }
+
+
+    public boolean saveImageToGallery(Context context, Bitmap bmp) {
+        String fileName = RandomUtil.getRandomLetters(6) + ".jpg";
+        String picturnPath = this.getExternalCacheDir() + File.separator + fileName;
+
+        boolean saveSuccess = BitmapUtil.saveBitmap(bmp, new File(picturnPath));
+
+        if (saveSuccess) {
+            // 其次把文件插入到系统图库
+            try {
+                MediaStore.Images.Media.insertImage(context.getContentResolver(),
+                        picturnPath, fileName, null);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            // 最后通知图库更新
+            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + path)));
+
+        }
+
+        return saveSuccess;
+
+    }
+
+    @Override
+    public void onRefresh() {
+        String uri = "http://" + ConfigUtil.getIp(this) + ":8080/?action=stream";
+        webView.loadUrl(uri);
+        refreshLayout.setRefreshing(false);
     }
 }
